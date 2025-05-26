@@ -12,6 +12,7 @@ set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_BUILD_ZLIB ON)
 
 add_library(arc
+    ${CMAKE_SOURCE_DIR}/src/arc_body.cpp
     ${CMAKE_SOURCE_DIR}/src/arc_physics_world.cpp
 )
 
