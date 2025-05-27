@@ -10,11 +10,11 @@ void PhysicsWorld::Simulate(double timeStep)
     for(auto& body : _bodies) {
         body.SetTimeStep(timeStep);
         
-        Vec3 gravForce = Vec3(0.0f, body.mass() * _gravity, 0.0f);
+        Vec3 gravForce = Vec3(0.0f, body.GetMass() * _gravity, 0.0f);
         body.AddForce(gravForce);
 
         body.Integrate();
     }
 
-    std::cout << "\r" << std::setw(4) << std::setfill(' ') << _bodies[0].position().y << std::flush;
+    std::cout << "\r" << std::setw(4) << std::setfill(' ') << _bodies[0].GetAcceleration().y << std::flush;
 }

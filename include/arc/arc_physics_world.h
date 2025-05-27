@@ -14,8 +14,9 @@ namespace arc
 
         double _gravity = GRAV_CONST;
     public:
-        void AddBody(Body body) {
+        Body* AddBody(Body body) {
             _bodies.push_back(body);
+            return &_bodies.back();
         }
 
         void SetGravity(double grav) {

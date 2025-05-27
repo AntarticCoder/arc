@@ -8,9 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(arc CXX C)
 
-set(ASSIMP_BUILD_TESTS OFF)
-set(ASSIMP_BUILD_ZLIB ON)
-
 add_library(arc
     ${CMAKE_SOURCE_DIR}/src/arc_body.cpp
     ${CMAKE_SOURCE_DIR}/src/arc_physics_world.cpp
@@ -27,6 +24,7 @@ target_link_libraries(arc PRIVATE
 option(BUILD_EXAMPLES "Build examples" ON)
 if(BUILD_EXAMPLES)
     add_subdirectory(examples/helloworld)
+    add_subdirectory(examples/opengl_2d)
 endif()
 
 

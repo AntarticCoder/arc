@@ -1,0 +1,5 @@
+find_package(SDL2 REQUIRED)
+find_package(OpenGL REQUIRED)
+add_executable(opengl_2d main.cpp)
+target_include_directories(opengl_2d PUBLIC ${CMAKE_SOURCE_DIR}/extern)
+target_link_libraries(opengl_2d PRIVATE arc SDL2::SDL2 OpenGL::GL)

@@ -53,6 +53,10 @@
         "typeinfo": "cpp",
         "unordered_map": "cpp",
         "variant": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "iomanip": "cpp",
+        "span": "cpp",
+        "__config": "cpp",
+        "fstream": "cpp"
     }
 }

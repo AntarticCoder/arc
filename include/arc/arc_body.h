@@ -21,9 +21,13 @@ namespace arc
 
         void Integrate();
 
-        Vec3 position() const { return _position; }
-        Vec3 velocity() const { return _velocity; }
-        Vec3 acceleration() const { return _acceleration; }
-        double mass() const { return _mass; }
+        Vec3 GetPosition() const { return _position; }
+        Vec3 GetVelocity() const { return _velocity; }
+        Vec3 GetAcceleration() const { return _acceleration; }
+        double GetMass() const { return _mass; }
+
+        void SetPosition(const Vec3 pos) { _position = pos; }
+        void SetVelocity(const Vec3 velocity) { _velocity = velocity; }
+        void SetAcceleration(const Vec3 acceleration) { _acceleration = acceleration;  }
     };
 }
