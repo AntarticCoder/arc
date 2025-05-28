@@ -47,6 +47,10 @@ namespace arc
         double GetMagnitude() {
             return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
         }
+
+        double Dot(Vec3 other) {
+            return (x * other.x) + (y * other.y) + (z * other.z);
+        }
     };
 
     inline Vec3 operator+(const Vec3& vec1, const Vec3& vec2)

@@ -9,6 +9,8 @@ A simple 2D physics that may be expanded upon in the future. Written in C++ 17.
 - [x] Change Body members to use proper Getter functions
 - [x] Change the body files to rigid body files
 - [x] Pass timestep into integrate function
+- [ ] Make Restitution a variable
+- [ ] Improve OpenGL example to take in objects as a vector instead of individually
 
 - [x] Implement Dynamics
 - [x] Implement 2D OpenGL example

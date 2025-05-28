@@ -6,7 +6,7 @@
 namespace arc
 {
     bool DetectAABBtoPoint(const AABB a, const Vec3 p);
-    bool DetectAABBtoAABB(const AABB& a, const AABB& b, const Vec3 transform = Vec3(0.0));
+    bool DetectAABBtoAABB(const AABB& a, const AABB& b);
 
     bool DetectCollision(RigidBody a, RigidBody b);
 }

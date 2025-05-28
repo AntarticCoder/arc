@@ -16,6 +16,7 @@ namespace arc
 
         double _mass = 1;
 
+        bool _static = false;
         bool _enableGravity = true;
     public:
         RigidBody(Vec3 pos, double mass ) : _position(pos), _mass(mass) {}
@@ -31,13 +32,15 @@ namespace arc
         Vec3 GetVelocity() const { return _velocity; }
         Vec3 GetAcceleration() const { return _acceleration; }
         double GetMass() const { return _mass; }
-        bool GetGravity() { return _enableGravity; }
-        Collider* GetCollider() { return _collider; }
+        bool GetStatic() const { return _static; }
+        bool GetGravity() const { return _enableGravity; }
+        Collider* GetCollider() const { return _collider; }
 
         void SetPosition(const Vec3 pos) { _position = pos; }
         void SetVelocity(const Vec3 velocity) { _velocity = velocity; }
         void SetAcceleration(const Vec3 acceleration) { _acceleration = acceleration;  }
         void SetMass(double mass) { _mass = mass; }
+        void SetStatic(bool stat) { _static = stat; }
         void SetGravity(bool grav) { _enableGravity = grav; }
         void SetCollider(Collider* collider) { _collider = collider; }
     };

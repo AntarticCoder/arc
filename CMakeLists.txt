@@ -12,6 +12,7 @@ add_library(arc
     ${CMAKE_SOURCE_DIR}/src/arc_collision_detection.cpp
     ${CMAKE_SOURCE_DIR}/src/arc_physics_world.cpp
     ${CMAKE_SOURCE_DIR}/src/arc_rigid_body.cpp
+    ${CMAKE_SOURCE_DIR}/src/arc_solver.cpp
 )
 
 target_include_directories(arc PUBLIC

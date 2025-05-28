@@ -21,6 +21,8 @@ struct GLData
 
     arc::Vec3 cubePosition;
     arc::Vec3 floorPosition;
+    arc::Vec3 floorScale;
+    arc::Vec3 body2Position;
 };
 
 void Ortho(float* matrix, float left, float right, float bottom, float top, float near, float far)
@@ -169,6 +171,10 @@ void Render(GLData* data)
     int location = 0;
     float cubePosition[2] = { static_cast<float>(data->cubePosition.x), static_cast<float>(data->cubePosition.y)};
     float floorPosition[2] = { static_cast<float>(data->floorPosition.x), static_cast<float>(data->floorPosition.y)};
+    float body2Position[2] = { static_cast<float>(data->body2Position.x), static_cast<float>(data->body2Position.y)};
+
+    float defaultScale[2] = { 1.0f, 1.0f };
+    float floorScale[2] = { static_cast<float>(data->floorScale.x), static_cast<float>(data->floorScale.y)};
 
     float perspectiveMatrix[16];
     float aspect = 800.0f / 600.0f;
@@ -195,6 +201,24 @@ void Render(GLData* data)
         glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
         location = glGetUniformLocation(data->shaderProgram, "position");
         glUniform2fv(location, 1, cubePosition);
+        location = glGetUniformLocation(data->shaderProgram, "scale");
+        glUniform2fv(location, 1, defaultScale);
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    // Second Cube
+    {
+        float color[3] = { 0.25f, 0.5f, 0.25f };
+        location = glGetUniformLocation(data->shaderProgram, "color");
+        glUniform3fv(location, 1, color);
+
+        location = glGetUniformLocation(data->shaderProgram, "perspective");
+        glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
+        location = glGetUniformLocation(data->shaderProgram, "position");
+        glUniform2fv(location, 1, body2Position);
+        location = glGetUniformLocation(data->shaderProgram, "scale");
+        glUniform2fv(location, 1, defaultScale);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
@@ -211,6 +235,8 @@ void Render(GLData* data)
         glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
         location = glGetUniformLocation(data->shaderProgram, "position");
         glUniform2fv(location, 1, floorPosition);
+        location = glGetUniformLocation(data->shaderProgram, "scale");
+        glUniform2fv(location, 1, floorScale);
     
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

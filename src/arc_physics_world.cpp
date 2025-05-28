@@ -1,5 +1,6 @@
 #include "arc/arc_physics_world.h"
 #include "arc/arc_collision_detection.h"
+#include "arc/arc_solver.h"
 
 #include <iostream>
 #include <iomanip>
@@ -28,20 +29,18 @@ void PhysicsWorld::Simulate(double timeStep)
         body->Integrate(timeStep);
     }
 
+    int count = 0;
     for(int i = 0; i < _bodies.size(); i++)
     {
-        if(_bodies[i]->GetCollider()) 
+        for(int j = i + 1; j < _bodies.size(); j++)
         {
-            for(int j = i + 1; j < _bodies.size(); j++)
-            {
-                if(!_bodies[j]->GetCollider()) continue;
+            count++;
+            if(!_bodies[j]->GetCollider() || !_bodies[i]->GetCollider()) continue;
 
-                if(DetectCollision(*_bodies[i] , *_bodies[j])) {
-                    std::cout << "Collision Found!!!" << std::endl;
-                }
+            if(DetectCollision(*_bodies[i] , *_bodies[j])) {
+                Solver::SolveAABBtoAABB(_bodies[i].get(), _bodies[j].get());
+                std::cout << "Collision Found!!!" << std::endl;
             }
         }
     }
-
-    // std::cout << _bodies[0]->GetPosition().y << std::endl;
 }

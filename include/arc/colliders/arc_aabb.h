@@ -13,6 +13,13 @@ namespace arc
         AABB(Vec3 basePoint, Vec3 endPoint) : basePoint(basePoint), endPoint(endPoint) {}
 
         ColliderType GetType() const override { return ColliderType::AABB; }
+
+        AABB* operator+=(const Vec3& vec)
+        {
+            basePoint + vec,
+            endPoint + vec;
+            return this;
+        }
     };
 
     inline AABB operator+(const AABB& aabb, const Vec3& vec)

@@ -2,31 +2,25 @@
 
 bool arc::DetectAABBtoPoint(const AABB a, const Vec3 p)
 {
-    if(a.basePoint.x > p.x && a.endPoint.x < p.x) {
-        if(a.basePoint.y > p.y && a.endPoint.y < p.y) {
-            if(a.basePoint.z > p.z && a.endPoint.z < p.z) {
-                return true;
-            }
-        }
-    }
-
-    return false;
+    return (
+        a.basePoint.x > p.x &&
+        a.endPoint.x  < p.x &&
+        a.basePoint.y > p.y &&
+        a.endPoint.y  < p.y && 
+        a.basePoint.z > p.z && 
+        a.endPoint.z  < p.z
+    );
 }
 
-bool arc::DetectAABBtoAABB(const AABB& a, const AABB& b, const Vec3 transform)
+bool arc::DetectAABBtoAABB(const AABB& a, const AABB& b)
 {
-    Vec3 aBasePoint = a.basePoint + transform;
-    Vec3 aEndPoint = a.endPoint + transform;
-    Vec3 bBasePoint = b.basePoint + transform;
-    Vec3 bEndPoint = b.endPoint + transform;
-
     return (
-        aBasePoint.x <= bEndPoint.x &&
-        aEndPoint.x  >= bBasePoint.x &&
-        aBasePoint.y <= bEndPoint.y &&
-        aEndPoint.y  >= bBasePoint.y &&
-        aBasePoint.z <= bEndPoint.z &&
-        aEndPoint.z  >= bBasePoint.z
+        a.basePoint.x <= b.endPoint.x &&
+        a.endPoint.x  >= b.basePoint.x &&
+        a.basePoint.y <= b.endPoint.y &&
+        a.endPoint.y  >= b.basePoint.y &&
+        a.basePoint.z <= b.endPoint.z &&
+        a.endPoint.z  >= b.basePoint.z
     );
 }
 
