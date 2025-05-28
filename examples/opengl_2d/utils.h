@@ -19,7 +19,8 @@ struct GLData
     unsigned VBO;
     unsigned shaderProgram;
 
-    arc::Vec2 position;
+    arc::Vec3 cubePosition;
+    arc::Vec3 floorPosition;
 };
 
 void Ortho(float* matrix, float left, float right, float bottom, float top, float near, float far)
@@ -160,13 +161,14 @@ GLData CreateOpenGLResources()
     return data;
 }
 
-void Render(GLData data)
+void Render(GLData* data)
 {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    arc::Vec2 position = data.position;
-    float glPosition[2] = { static_cast<float>(position.x), static_cast<float>(position.y)};
+    int location = 0;
+    float cubePosition[2] = { static_cast<float>(data->cubePosition.x), static_cast<float>(data->cubePosition.y)};
+    float floorPosition[2] = { static_cast<float>(data->floorPosition.x), static_cast<float>(data->floorPosition.y)};
 
     float perspectiveMatrix[16];
     float aspect = 800.0f / 600.0f;
@@ -180,14 +182,36 @@ void Render(GLData data)
         1.0f
     );
 
-    glBindVertexArray(data.VAO);
-    glUseProgram(data.shaderProgram);
+    glBindVertexArray(data->VAO);
+    glUseProgram(data->shaderProgram);
 
-    int location = glGetUniformLocation(data.shaderProgram, "perspective");
-    glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
+    // Falling Cube
+    {
+        float color[3] = { 1.0f, 0.5f, 0.25f };
+        location = glGetUniformLocation(data->shaderProgram, "color");
+        glUniform3fv(location, 1, color);
 
-    location = glGetUniformLocation(data.shaderProgram, "position");
-    glUniform2fv(location, 1, glPosition);
+        location = glGetUniformLocation(data->shaderProgram, "perspective");
+        glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
+        location = glGetUniformLocation(data->shaderProgram, "position");
+        glUniform2fv(location, 1, cubePosition);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    // Floor
+    {
+        glUseProgram(data->shaderProgram);
+
+        float color[3] = { 0.25f, 0.5f, 1.0f };
+        location = glGetUniformLocation(data->shaderProgram, "color");
+        glUniform3fv(location, 1, color);
+        
+        location = glGetUniformLocation(data->shaderProgram, "perspective");
+        glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
+        location = glGetUniformLocation(data->shaderProgram, "position");
+        glUniform2fv(location, 1, floorPosition);
+    
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
 }

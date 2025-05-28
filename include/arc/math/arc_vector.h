@@ -21,6 +21,7 @@ namespace arc
         Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
         Vec3(double x) : x(x), y(x), z(x) {}
         Vec3(double x, double y, double z) : x(x), y(y), z(z) {}
+        Vec3(Vec2 vec, double z) : x(vec.x), y(vec.y), z(z) {}
 
         Vec3& operator+=(const Vec3& other) {
             x += other.x;

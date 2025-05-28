@@ -9,11 +9,19 @@
 
 #include "utils.h"
 #include "arc/arc_physics_world.h"
+#include "arc/colliders/arc_aabb.h"
 
 int main()
 {
     arc::PhysicsWorld world;
-    arc::Body* body = world.AddBody(arc::Body(arc::Vec3(), 2.0));
+    world.SetGravity(-3.0f);
+
+    arc::RigidBody* body = world.CreateBody(arc::Vec3(0.0f), 1.0f);
+    body->AddAABB(arc::Vec3(-0.5f, -0.5f, 0.0f), arc::Vec3(0.5f, 0.5f, 0.0f));
+
+    arc::RigidBody* floor = world.CreateBody(arc::Vec3(0.0f, -7.5f, 0.0f), 10.0f);
+    floor->AddAABB(arc::Vec3(-0.5f, -0.5f, 0.0f), arc::Vec3(0.5f, 0.5f, 0.0f));
+    floor->SetGravity(false);
     
     ExampleData data = IntializeExample();
     GLData glData = CreateOpenGLResources();
@@ -51,8 +59,10 @@ int main()
             body->SetPosition(arc::Vec3(body->GetPosition().x, 10.0f, 0.0f));
         }
 
-        glData.position = arc::Vec2(body->GetPosition().x, body->GetPosition().y);
-        Render(glData);
+        glData.cubePosition = body->GetPosition();
+        glData.floorPosition = floor->GetPosition();
+
+        Render(&glData);
 
         SDL_GL_SwapWindow(data.window);
     }

@@ -6,7 +6,7 @@
 int main()
 {
     arc::PhysicsWorld world;
-    arc::Body body = arc::Body(arc::Vec3(), 2.0);
+    arc::RigidBody body = arc::RigidBody(arc::Vec3(), 2.0);
     world.AddBody(body);
 
     const double timeStep = 1.0 / 60.0; 
