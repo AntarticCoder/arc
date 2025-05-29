@@ -22,7 +22,7 @@ void PhysicsWorld::Simulate(double timeStep)
     for(auto& body : _bodies) 
     {   
         Vec3 gravForce = Vec3(0.0f, body->GetMass() * _gravity, 0.0f);
-        if(body->GetGravity()) {
+        if(body->GetGravity() || body->GetStatic() || body->GetTrigger()) {
             body->AddForce(gravForce);
         }
 
@@ -37,9 +37,17 @@ void PhysicsWorld::Simulate(double timeStep)
             count++;
             if(!_bodies[j]->GetCollider() || !_bodies[i]->GetCollider()) continue;
 
-            if(DetectCollision(*_bodies[i] , *_bodies[j])) {
-                Solver::SolveAABBtoAABB(_bodies[i].get(), _bodies[j].get());
-                std::cout << "Collision Found!!!" << std::endl;
+            if(DetectCollision(*_bodies[i] , *_bodies[j])) 
+            {
+                if(!_bodies[i]->GetTrigger() && !_bodies[j]->GetTrigger())
+                {
+                    Solver::SolveAABBtoAABB(_bodies[i].get(), _bodies[j].get());
+                    std::cout << "Collision Found!!!" << std::endl;
+                } else
+                {
+                    _bodies[i]->GetCollider()->TriggerCallback();
+                    _bodies[j]->GetCollider()->TriggerCallback();
+                }
             }
         }
     }

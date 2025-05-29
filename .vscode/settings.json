@@ -57,6 +57,7 @@
         "iomanip": "cpp",
         "span": "cpp",
         "__config": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "cinttypes": "cpp"
     }
 }

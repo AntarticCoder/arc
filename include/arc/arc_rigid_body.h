@@ -16,6 +16,7 @@ namespace arc
 
         double _mass = 1;
 
+        bool _trigger = false;
         bool _static = false;
         bool _enableGravity = true;
     public:
@@ -32,6 +33,7 @@ namespace arc
         Vec3 GetVelocity() const { return _velocity; }
         Vec3 GetAcceleration() const { return _acceleration; }
         double GetMass() const { return _mass; }
+        bool GetTrigger() const { return _trigger; }
         bool GetStatic() const { return _static; }
         bool GetGravity() const { return _enableGravity; }
         Collider* GetCollider() const { return _collider; }
@@ -40,6 +42,7 @@ namespace arc
         void SetVelocity(const Vec3 velocity) { _velocity = velocity; }
         void SetAcceleration(const Vec3 acceleration) { _acceleration = acceleration;  }
         void SetMass(double mass) { _mass = mass; }
+        void SetTrigger(bool trigger) { _trigger = trigger; }
         void SetStatic(bool stat) { _static = stat; }
         void SetGravity(bool grav) { _enableGravity = grav; }
         void SetCollider(Collider* collider) { _collider = collider; }

@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <chrono>
+#include <random>
 
 #include <glad/gl.h>
 #include <SDL.h>
@@ -13,16 +15,25 @@ struct ExampleData
     SDL_GLContext glContext;
 };
 
-struct GLData
+struct Object
+{
+    arc::Vec3 position = arc::Vec3(0.0f);
+    arc::Vec3 scale = arc::Vec3(1.0f);
+    arc::Vec3 color = arc::Vec3(0.0f);
+
+    Object(arc::Vec3 pos) : position(pos) {}
+    Object(arc::Vec3 pos, arc::Vec3 scale) : position(pos), scale(scale) {}
+};
+
+struct GraphicsData
 {
     unsigned VAO;
     unsigned VBO;
     unsigned shaderProgram;
 
-    arc::Vec3 cubePosition;
-    arc::Vec3 floorPosition;
-    arc::Vec3 floorScale;
-    arc::Vec3 body2Position;
+    std::vector<Object> objects;
+    std::vector<arc::Vec3> randomColors;
+    std::vector<Object> triggers;
 };
 
 void Ortho(float* matrix, float left, float right, float bottom, float top, float near, float far)
@@ -100,9 +111,9 @@ ExampleData IntializeExample()
     return data;
 }
 
-GLData CreateOpenGLResources()
+GraphicsData CreateOpenGLResources()
 {
-    GLData data = {};
+    GraphicsData data = {};
 
     const float quadVertices[] = {
          0.5f,  0.5f, 0.0f,
@@ -160,22 +171,21 @@ GLData CreateOpenGLResources()
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    for(int i = 0; i < 16; i++) {
+        std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+        std::uniform_real_distribution<float> distribution(0.0, 1.0);
+        data.randomColors.push_back(arc::Vec3(1.0f, distribution(rng), distribution(rng)));
+    }
+
     return data;
 }
 
-void Render(GLData* data)
+void Render(GraphicsData* data)
 {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     int location = 0;
-    float cubePosition[2] = { static_cast<float>(data->cubePosition.x), static_cast<float>(data->cubePosition.y)};
-    float floorPosition[2] = { static_cast<float>(data->floorPosition.x), static_cast<float>(data->floorPosition.y)};
-    float body2Position[2] = { static_cast<float>(data->body2Position.x), static_cast<float>(data->body2Position.y)};
-
-    float defaultScale[2] = { 1.0f, 1.0f };
-    float floorScale[2] = { static_cast<float>(data->floorScale.x), static_cast<float>(data->floorScale.y)};
-
     float perspectiveMatrix[16];
     float aspect = 800.0f / 600.0f;
     float perspectiveScale = 10.0f;
@@ -188,56 +198,51 @@ void Render(GLData* data)
         1.0f
     );
 
-    glBindVertexArray(data->VAO);
-    glUseProgram(data->shaderProgram);
-
-    // Falling Cube
+    for(int i = 0; i < data->objects.size(); i++)
     {
-        float color[3] = { 1.0f, 0.5f, 0.25f };
-        location = glGetUniformLocation(data->shaderProgram, "color");
-        glUniform3fv(location, 1, color);
+        auto object = data->objects[i];
 
-        location = glGetUniformLocation(data->shaderProgram, "perspective");
-        glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
-        location = glGetUniformLocation(data->shaderProgram, "position");
-        glUniform2fv(location, 1, cubePosition);
-        location = glGetUniformLocation(data->shaderProgram, "scale");
-        glUniform2fv(location, 1, defaultScale);
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
-
-    // Second Cube
-    {
-        float color[3] = { 0.25f, 0.5f, 0.25f };
-        location = glGetUniformLocation(data->shaderProgram, "color");
-        glUniform3fv(location, 1, color);
-
-        location = glGetUniformLocation(data->shaderProgram, "perspective");
-        glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
-        location = glGetUniformLocation(data->shaderProgram, "position");
-        glUniform2fv(location, 1, body2Position);
-        location = glGetUniformLocation(data->shaderProgram, "scale");
-        glUniform2fv(location, 1, defaultScale);
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
-
-    // Floor
-    {
+        glBindVertexArray(data->VAO);
         glUseProgram(data->shaderProgram);
 
-        float color[3] = { 0.25f, 0.5f, 1.0f };
+        float color[3] = {(float)data->randomColors[i % 16].x, (float)data->randomColors[i % 16].y, (float)data->randomColors[i % 16].z};
+        float position[2] = {(float)object.position.x, (float)object.position.y};
+        float scale[2] = {(float)object.scale.x, (float)object.scale.y};
+        
         location = glGetUniformLocation(data->shaderProgram, "color");
         glUniform3fv(location, 1, color);
-        
         location = glGetUniformLocation(data->shaderProgram, "perspective");
         glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
         location = glGetUniformLocation(data->shaderProgram, "position");
-        glUniform2fv(location, 1, floorPosition);
+        glUniform2fv(location, 1, position);
         location = glGetUniformLocation(data->shaderProgram, "scale");
-        glUniform2fv(location, 1, floorScale);
+        glUniform2fv(location, 1, scale);
     
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
+
+    for(int i = 0; i < data->triggers.size(); i++)
+    {
+        auto trigger = data->triggers[i];
+
+        glBindVertexArray(data->VAO);
+        glUseProgram(data->shaderProgram);
+
+        float color[3] = {(float)data->randomColors[i % 16].x, (float)data->randomColors[i % 16].y, (float)data->randomColors[i % 16].z};
+        float position[2] = {(float)trigger.position.x, (float)trigger.position.y};
+        float scale[2] = {(float)trigger.scale.x, (float)trigger.scale.y};
+        
+        location = glGetUniformLocation(data->shaderProgram, "color");
+        glUniform3fv(location, 1, color);
+        location = glGetUniformLocation(data->shaderProgram, "perspective");
+        glUniformMatrix4fv(location, 1, GL_FALSE, perspectiveMatrix);
+        location = glGetUniformLocation(data->shaderProgram, "position");
+        glUniform2fv(location, 1, position);
+        location = glGetUniformLocation(data->shaderProgram, "scale");
+        glUniform2fv(location, 1, scale);
+        
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }
