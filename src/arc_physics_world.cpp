@@ -22,7 +22,8 @@ void PhysicsWorld::Simulate(double timeStep)
     for(auto& body : _bodies) 
     {   
         Vec3 gravForce = Vec3(0.0f, body->GetMass() * _gravity, 0.0f);
-        if(body->GetGravity() || body->GetStatic() || body->GetTrigger()) {
+
+        if(body->GetGravity() && !body->GetStatic() && !body->GetTrigger()) {
             body->AddForce(gravForce);
         }
 

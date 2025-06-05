@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <sstream>
 
 #define GLAD_GL_IMPLEMENTATION
 #include "utils.h"
