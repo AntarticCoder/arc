@@ -7,47 +7,43 @@
 
 using namespace arc;
 
-RigidBody* PhysicsWorld::CreateBody(Vec3 position, double mass){
-    return CreateBody(position, mass, nullptr);
-}
-
-RigidBody* PhysicsWorld::CreateBody(Vec3 position, double mass, Collider* collider)
-{
-    _bodies.push_back(std::make_unique<RigidBody>(position, mass, collider));
-    return _bodies.back().get();
-}
-
 void PhysicsWorld::Simulate(double timeStep)
 {
-    for(auto& body : _bodies) 
-    {   
-        Vec3 gravForce = Vec3(0.0f, body->GetMass() * _gravity, 0.0f);
+    for(auto &object : _objects)
+    {
+        RigidBody& rigidBody = object->rigidBody;
+        Transform& transform = object->transform;
 
-        if(body->GetGravity() && !body->GetStatic() && !body->GetTrigger()) {
-            body->AddForce(gravForce);
+        Vec3 gravForce = Vec3(0.0f, rigidBody.GetMass() * _gravity, 0.0f);
+
+        if(rigidBody.GetGravity() && !rigidBody.GetStatic() && !rigidBody.GetTrigger()) {
+            rigidBody.AddForce(gravForce);
         }
 
-        body->Integrate(timeStep);
+        rigidBody.Integrate(transform, timeStep);
     }
 
     int count = 0;
-    for(int i = 0; i < _bodies.size(); i++)
+    for(int i = 0; i < _objects.size(); i++)
     {
-        for(int j = i + 1; j < _bodies.size(); j++)
+        for(int j = i + 1; j < _objects.size(); j++)
         {
             count++;
-            if(!_bodies[j]->GetCollider() || !_bodies[i]->GetCollider()) continue;
 
-            if(DetectCollision(*_bodies[i] , *_bodies[j])) 
+            if(!_objects[i]->collider || !_objects[j]->collider)
+                continue;
+
+            if(DetectCollision(*_objects[i], *_objects[j]))
             {
-                if(!_bodies[i]->GetTrigger() && !_bodies[j]->GetTrigger())
+                if(!_objects[i]->rigidBody.GetTrigger() && !_objects[j]->rigidBody.GetTrigger())
                 {
-                    Solver::SolveAABBtoAABB(_bodies[i].get(), _bodies[j].get());
+                    Solver::SolveAABBtoAABB(_objects[i].get(), _objects[j].get());
                     std::cout << "Collision Found!!!" << std::endl;
-                } else
+                }
+                else
                 {
-                    _bodies[i]->GetCollider()->TriggerCallback();
-                    _bodies[j]->GetCollider()->TriggerCallback();
+                    _objects[i]->collider->TriggerCallback();
+                    _objects[j]->collider->TriggerCallback();
                 }
             }
         }

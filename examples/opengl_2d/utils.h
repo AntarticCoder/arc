@@ -15,14 +15,14 @@ struct ExampleData
     SDL_GLContext glContext;
 };
 
-struct Object
+struct Renderable
 {
     arc::Vec3 position = arc::Vec3(0.0f);
     arc::Vec3 scale = arc::Vec3(1.0f);
     arc::Vec3 color = arc::Vec3(0.0f);
 
-    Object(arc::Vec3 pos) : position(pos) {}
-    Object(arc::Vec3 pos, arc::Vec3 scale) : position(pos), scale(scale) {}
+    Renderable(arc::Vec3 pos) : position(pos) {}
+    Renderable(arc::Vec3 pos, arc::Vec3 scale) : position(pos), scale(scale) {}
 };
 
 struct GraphicsData
@@ -31,9 +31,9 @@ struct GraphicsData
     unsigned VBO;
     unsigned shaderProgram;
 
-    std::vector<Object> objects;
+    std::vector<Renderable> objects;
     std::vector<arc::Vec3> randomColors;
-    std::vector<Object> triggers;
+    std::vector<Renderable> triggers;
 };
 
 void Ortho(float* matrix, float left, float right, float bottom, float top, float near, float far)

@@ -24,16 +24,16 @@ bool arc::DetectAABBtoAABB(const AABB& a, const AABB& b)
     );
 }
 
-bool arc::DetectCollision(RigidBody a, RigidBody b)
+bool arc::DetectCollision(Object a, Object b)
 {
-    Collider* aCol = a.GetCollider();
-    Collider* bCol = b.GetCollider();
+    Collider* aCol = a.collider;
+    Collider* bCol = b.collider;
 
     if(aCol->GetType() == ColliderType::AABB)
     {
         if(bCol->GetType() == ColliderType::AABB) 
         {
-            return DetectAABBtoAABB(*static_cast<AABB*>(aCol) + a.GetPosition(), *static_cast<AABB*>(bCol) + b.GetPosition());
+            return DetectAABBtoAABB(*static_cast<AABB*>(aCol) + a.transform.position, *static_cast<AABB*>(bCol) + b.transform.position);
         }
     }
     return false;

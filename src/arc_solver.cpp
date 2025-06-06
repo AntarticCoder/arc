@@ -3,10 +3,10 @@
 
 using namespace arc;
 
-void Solver::SolveAABBtoAABB(RigidBody* aBody, RigidBody* bBody)
+void Solver::SolveAABBtoAABB(Object* aObj, Object* bObj)
 {
-    AABB a = *static_cast<AABB*>(aBody->GetCollider()) + aBody->GetPosition();
-    AABB b = *static_cast<AABB*>(bBody->GetCollider()) + bBody->GetPosition();
+    AABB a = *static_cast<AABB*>(aObj->collider) + aObj->transform.position;
+    AABB b = *static_cast<AABB*>(bObj->collider) + bObj->transform.position;
 
     bool xOverlap = (a.basePoint.x < b.endPoint.x && a.endPoint.x > b.basePoint.x);
     if(!xOverlap) return;
@@ -48,29 +48,28 @@ void Solver::SolveAABBtoAABB(RigidBody* aBody, RigidBody* bBody)
 
     Vec3 shift = (shiftDirection * actualShift);
 
-    if(!aBody->GetStatic()) {
-        aBody->SetPosition(aBody->GetPosition() + shift);
+    if(!aObj->rigidBody.GetStatic()) {
+        aObj->transform.position += shift;
     }   
 
-    if(!bBody->GetStatic()) {
-        bBody->SetPosition(bBody->GetPosition() - shift);
+    if(!bObj->rigidBody.GetStatic()) {
+        bObj->transform.position -= shift;
     }
 
-    double relativeVelocityDotNormal = (aBody->GetVelocity() - bBody->GetVelocity()).Dot(collisionNormal);
+    double relativeVelocityDotNormal = (aObj->rigidBody.GetVelocity() - bObj->rigidBody.GetVelocity()).Dot(collisionNormal);
 
-    double invMassA = (1.0 / aBody->GetMass());
-    double invMassB = (1.0 / bBody->GetMass());
-
+    double invMassA = (1.0 / aObj->rigidBody.GetMass());
+    double invMassB = (1.0 / bObj->rigidBody.GetMass());
     double totalInvMass = invMassA + invMassB;
     double RESTITUTION = 0.2;
 
     double impulseMagnitude = -(1.0 + RESTITUTION) * relativeVelocityDotNormal / totalInvMass;
 
-    if(!aBody->GetStatic()) {
-        aBody->SetVelocity(aBody->GetVelocity() + collisionNormal * (impulseMagnitude * invMassA));
+    if(!aObj->rigidBody.GetStatic()) {
+        aObj->rigidBody.SetVelocity(aObj->rigidBody.GetVelocity() + collisionNormal * (impulseMagnitude * invMassA));
     }
 
-    if(!bBody->GetStatic()) {
-        bBody->SetVelocity(bBody->GetVelocity() - collisionNormal * (impulseMagnitude * invMassB));
+    if(!bObj->rigidBody.GetStatic()) {
+        bObj->rigidBody.SetVelocity(bObj->rigidBody.GetVelocity() - collisionNormal * (impulseMagnitude * invMassB));
     }
 }

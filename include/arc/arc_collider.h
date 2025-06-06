@@ -11,7 +11,7 @@ namespace arc
         AABB = 1,
         SPHERE = 2
     };
-
+    
     class Collider
     {
     private:

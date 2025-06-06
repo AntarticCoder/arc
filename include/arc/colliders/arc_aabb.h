@@ -29,4 +29,14 @@ namespace arc
             aabb.endPoint + vec
         );
     }
+
+    static AABB* CreateAABB(Vec3 basePoint, Vec3 endPoint) {
+        return new AABB(basePoint, endPoint);
+    }
+
+    static AABB* CreateAABB(double height, double width, double depth) {
+        Vec3 base = Vec3(-height/2, -width/2, -depth/2);
+        Vec3 end = Vec3(height/2, width/2, depth/2);
+        return new AABB(base, end);
+    }
 }

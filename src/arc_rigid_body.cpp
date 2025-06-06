@@ -8,12 +8,10 @@ void RigidBody::AddForce(const Vec3 force)
     _force += force;
 }
 
-void RigidBody::AddAABB(Vec3 basePoint, Vec3 endPoint) {
-    _collider = new AABB(basePoint, endPoint);
-}
-
-void RigidBody::Integrate(double timeStep)
+void RigidBody::Integrate(Transform& transform, double timeStep)
 {
+    _position = transform.position;
+
     _acceleration = (_force / GetMass()); 
     _velocity += (_acceleration * timeStep);
 
@@ -23,4 +21,6 @@ void RigidBody::Integrate(double timeStep)
 
     _position = _position + (_velocity * timeStep) +  ((_acceleration * 0.5f) * timeStep * timeStep); // Xf = Xi + VoT + 0.5AT^2
     _force = Vec3(0.0f);
+
+    transform.position = _position;
 }

@@ -4,9 +4,8 @@
 #include <sstream>
 
 #define GLAD_GL_IMPLEMENTATION
-#include "utils.h"
 #include <SDL.h>
-#include <SDL_opengl.h>
+// #include <SDL_opengl.h>
 
 #include "utils.h"
 #include "arc/arc_physics_world.h"
@@ -17,26 +16,59 @@ int main()
     arc::PhysicsWorld world;
     world.SetGravity(-3.0f);
 
-    arc::RigidBody* body = world.CreateBody(arc::Vec3(0.0f), 1.0f);
-    body->AddAABB(arc::Vec3(-0.5f, -0.5f, 0.0f), arc::Vec3(0.5f, 0.5f, 0.0f));
+    // Box 1 Creation
+    arc::RigidBodyCreateInfo box1RBCreateInfo = {};
+    box1RBCreateInfo.mass = 1.0f;
 
-    arc::RigidBody* body2 = world.CreateBody(arc::Vec3(10.0f, 0.0f, 0.0f), 1.0f);
-    body2->AddAABB(arc::Vec3(-0.5f, -0.5f, 0.0f), arc::Vec3(0.5f, 0.5f, 0.0f));
-    body2->SetVelocity(arc::Vec3(-3.0f, 0.0f, 0.0f));
+    arc::Object box1Info;
+    box1Info.rigidBody = arc::RigidBody(box1RBCreateInfo);
+    box1Info.transform.position = arc::Vec3(-10.0f, 5.0f, 0.0f);
+    box1Info.collider = arc::CreateAABB(1.0f, 1.0f, 0.0f);
 
-    arc::RigidBody* floor = world.CreateBody(arc::Vec3(0.0f, -10.0f, 0.0f), 10.0f);
-    floor->AddAABB(arc::Vec3(-50.0f, -5.0f, 0.0f), arc::Vec3(50.0f, 5.0f, 0.0f));
-    floor->SetGravity(false);
-    floor->SetStatic(true);
+    arc::Object* box1 = world.AddObject(box1Info);
 
-    arc::RigidBody* trigger = world.CreateBody(arc::Vec3(-7.0f, -1.9f, 0.0f), 1.0f);
-    trigger->AddAABB(arc::Vec3(-3.0f, -3.0f, 0.0f), arc::Vec3(3.0f, 3.0f, 0.0f));
-    trigger->SetTrigger(true);
-    trigger->SetGravity(false);
+    // Box 2 Creation
+    arc::RigidBodyCreateInfo box2RBCreateInfo = {};
+    box2RBCreateInfo.mass = 1.0f;
 
-    trigger->GetCollider()->SetCallback([](){
+    arc::Object box2Info;
+    box2Info.rigidBody = arc::RigidBody(box2RBCreateInfo);
+    box2Info.transform.position = arc::Vec3(0.0f, 5.0f, 0.0f);
+    box2Info.collider = arc::CreateAABB(1.0f, 1.0f, 0.0f);
+
+    arc::Object* box2 = world.AddObject(box2Info);
+
+    // Floor Creation
+    arc::RigidBodyCreateInfo floorRBCreateInfo = {};
+    floorRBCreateInfo.mass = 10.0f;
+    floorRBCreateInfo.applyGravity = false;
+    floorRBCreateInfo.isStatic = true;
+
+    arc::Object floorInfo;
+    floorInfo.rigidBody = arc::RigidBody(floorRBCreateInfo);
+    floorInfo.transform.position = arc::Vec3(0.0f, -10.0f, 0.0f);
+    floorInfo.collider = arc::CreateAABB(100.0f, 10.0f, 0.0f);
+
+    arc::Object* floor = world.AddObject(floorInfo);
+
+    // Trigger Creation
+    arc::RigidBodyCreateInfo triggerRBCreateInfo = {};
+    triggerRBCreateInfo.mass = 1.0f;
+    triggerRBCreateInfo.isStatic = true;
+    triggerRBCreateInfo.isTrigger = true;
+
+    arc::Object triggerInfo;
+    triggerInfo.rigidBody = arc::RigidBody(triggerRBCreateInfo);
+    triggerInfo.transform.position = arc::Vec3(-7.0f, -1.9f, 0.0f);
+    triggerInfo.collider = arc::CreateAABB(6.0f, 6.0f, 0.0f);
+
+    arc::Object* trigger = world.AddObject(triggerInfo);
+
+    trigger->collider->SetCallback([](){
         std::cout << "Object inside Trigger" << std::endl;
     });
+
+    box2->rigidBody.SetVelocity(arc::Vec3(-3.0f, 0.0f, 0.0f));
     
     ExampleData data = IntializeExample();
     GraphicsData graphicsData = CreateOpenGLResources();
@@ -70,22 +102,23 @@ int main()
                 run = false;
         }
 
-        if(body->GetPosition().y < -10) {
-            body->SetPosition(arc::Vec3(body->GetPosition().x, 10.0f, 0.0f));
+        if(box1->transform.position.y < -10) {
+            box1->transform.position.y = 10;
         }
 
-        if(body2->GetPosition().y < -10) {
-            body2->SetPosition(arc::Vec3(body->GetPosition().x, 12.0f, 0.0f));
+        if(box2->transform.position.y < -10) {
+            // body2->SetPosition(arc::Vec3(body->GetPosition().x, 12.0f, 0.0f));
+            box2->transform.position.y += 12;
         }
 
         graphicsData.objects = {
-            Object(body->GetPosition()),
-            Object(body2->GetPosition()),
-            Object(floor->GetPosition(), arc::Vec3(100.0f, 10.0f, 1.0f))
+            Renderable(box1->transform.position),
+            Renderable(box2->transform.position),
+            Renderable(floor->transform.position, arc::Vec3(100.0f, 10.0f, 1.0f))
         };
 
         graphicsData.triggers = {
-            Object(trigger->GetPosition(), arc::Vec3(6.0, 6.0, 1.0))
+            Renderable(trigger->transform.position, arc::Vec3(6.0, 6.0, 1.0))
         };
 
         Render(&graphicsData);

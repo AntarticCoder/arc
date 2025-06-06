@@ -1,33 +1,43 @@
 #pragma once
 #include "arc/math/arc_vector.h"
 #include "arc/arc_collider.h"
+#include "arc/math/arc_transform.h"
 
 namespace arc
 {
+    struct RigidBodyCreateInfo
+    {
+        double mass = 1.0f;
+        bool applyGravity = true;
+        bool isStatic = false;
+        bool isTrigger = false;
+    };
+
     class RigidBody
     {
     private:
-        Vec3 _position;
-        Vec3 _velocity;
-        Vec3 _acceleration;
-        Vec3 _force;
-
-        Collider* _collider = nullptr;
+        Vec3 _position = Vec3(0.0f);
+        Vec3 _velocity = Vec3(0.0f);
+        Vec3 _acceleration = Vec3(0.0f);
+        Vec3 _force = Vec3(0.0f);
 
         double _mass = 1;
 
         bool _trigger = false;
         bool _static = false;
-        bool _enableGravity = true;
+        bool _applyGravity = true;
     public:
-        RigidBody(Vec3 pos, double mass ) : _position(pos), _mass(mass) {}
-        RigidBody(Vec3 pos, double mass, Collider* collider) : _position(pos), _mass(mass), _collider(collider) {}
+        RigidBody() {}
+        RigidBody(RigidBodyCreateInfo info) : 
+            _position(Vec3(0.0f)), 
+            _mass(info.mass),  
+            _applyGravity(info.applyGravity),
+            _static(info.isStatic),
+            _trigger(info.isTrigger) {}
 
         void AddForce(const Vec3 force);
 
-        void Integrate(double timeStep);
-
-        void AddAABB(Vec3 basePoint, Vec3 endPoint);
+        void Integrate(Transform& transform, double timeStep);
 
         Vec3 GetPosition() const { return _position; }
         Vec3 GetVelocity() const { return _velocity; }
@@ -35,8 +45,7 @@ namespace arc
         double GetMass() const { return _mass; }
         bool GetTrigger() const { return _trigger; }
         bool GetStatic() const { return _static; }
-        bool GetGravity() const { return _enableGravity; }
-        Collider* GetCollider() const { return _collider; }
+        bool GetGravity() const { return _applyGravity; }
 
         void SetPosition(const Vec3 pos) { _position = pos; }
         void SetVelocity(const Vec3 velocity) { _velocity = velocity; }
@@ -44,7 +53,6 @@ namespace arc
         void SetMass(double mass) { _mass = mass; }
         void SetTrigger(bool trigger) { _trigger = trigger; }
         void SetStatic(bool stat) { _static = stat; }
-        void SetGravity(bool grav) { _enableGravity = grav; }
-        void SetCollider(Collider* collider) { _collider = collider; }
+        void SetGravity(bool grav) { _applyGravity = grav; }
     };
 }
